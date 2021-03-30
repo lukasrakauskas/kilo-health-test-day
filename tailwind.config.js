@@ -5,8 +5,16 @@ module.exports = {
   darkMode: false,
   theme: {
     extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#AA00FF',
+        },
+      },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+      },
+      transitionProperty: {
+        width: 'width',
       },
     },
   },
