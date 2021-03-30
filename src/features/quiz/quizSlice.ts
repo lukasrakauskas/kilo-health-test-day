@@ -2,19 +2,21 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { QuizDTO } from './quizDto';
 
+const KILO_API = 'https://rnd-stage.kilo.live/api';
+
 export const fetchQuiz = createAsyncThunk<QuizDTO, string>(
   'quiz/fetchQuiz',
   async (slug, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `https://rnd-stage.kilo.live/api/quizzes/${slug}?api_token=${process.env.REACT_APP_KILO_API_KEY}`
+        `${KILO_API}/quizzes/${slug}?api_token=${process.env.REACT_APP_KILO_API_KEY}`
       );
 
       if (!response.ok) {
         throw Error(response.statusText);
       }
 
-      const data = await response.json();
+      const data = (await response.json()).data;
       return data as QuizDTO;
     } catch (error) {
       return rejectWithValue(error);
@@ -37,7 +39,9 @@ const initialState: QuizState = {
 export const quizSlice = createSlice({
   name: 'quiz',
   initialState,
-  reducers: {},
+  reducers: {
+    reset: () => ({ ...initialState }),
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchQuiz.pending, (state) => {
       state.status = 'pending';
@@ -52,5 +56,7 @@ export const quizSlice = createSlice({
     });
   },
 });
+
+export const resetQuiz = quizSlice.actions.reset;
 
 export default quizSlice.reducer;
