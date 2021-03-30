@@ -47,22 +47,33 @@ function Quiz({
   }, [dispatch, slug]);
 
   if (status === 'error') {
-    return <p>{error}</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">{error}</div>
+    );
   }
 
   if (status === 'idle' || status === 'pending' || quiz == null) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (submitted) {
-    return <p>Thank you for answering this quizz</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Thank you for answering this quizz
+      </div>
+    );
   }
 
+  const totalQuestions = quiz.questions.length;
   const questionKey = params.questionSlug;
 
   if (questionKey == null) {
     const firstQuestionKey = quiz.questions?.[0]?.key;
-    if (firstQuestionKey) history.push(`/${slug}/${firstQuestionKey}`);
+    if (firstQuestionKey) history.replace(`/${slug}/${firstQuestionKey}`);
     return <p>Loading...</p>;
   }
 
@@ -86,18 +97,40 @@ function Quiz({
     }
   };
 
+  const handleBackClick = (): void => {
+    history.goBack();
+  };
+
+  const completePercentage =
+    (100 * (currentQuestionIndex + 1)) / totalQuestions;
+
   return (
-    <div>
-      <p>Quiz:</p>
-      <p>{quiz.name}</p>
+    <div className="h-screen">
+      <div className="flex flex-col h-12 mb-2 border-b-2 border-gray-200 shadow-xl">
+        <div className="flex items-center justify-between flex-1 w-full px-4">
+          <button className="outline-none" onClick={handleBackClick}>
+            Back
+          </button>
+          <span>
+            <span className="font-bold">{currentQuestionIndex + 1}</span> of{' '}
+            {totalQuestions}
+          </span>
+        </div>
+        <div
+          id="loading-bar"
+          className="max-w-full bg-primary transition-width"
+          style={{ height: 2, bottom: -2, width: `${completePercentage}%` }}
+        ></div>
+      </div>
 
-      <button>Back</button>
-
-      <hr />
-
-      {currentQuestion
-        ? renderQuestion({ question: currentQuestion, onAnswer: handleAnswer })
-        : null}
+      <div className="p-4">
+        {currentQuestion
+          ? renderQuestion({
+              question: currentQuestion,
+              onAnswer: handleAnswer,
+            })
+          : null}
+      </div>
     </div>
   );
 }
